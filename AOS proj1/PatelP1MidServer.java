@@ -3,6 +3,7 @@
 //**** Name: Swapnil Patel. Id: 1966690. Course: AOS
 //**** Project-1, Date: 02/24/2022
 //*********************************************************
+//❌✅👋🥳
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,11 +17,13 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class CommonData {
+class CommonMidData {
 
     // authentication details
     static Map<String, AuthCred> AUTH_LIST = new HashMap<String, AuthCred>();
-    static Map<Integer, Socket> GROUP_LIST = new HashMap<Integer, Socket>();
+    static Map<String, String> GROUP_LIST = new HashMap<String, String>();
+
+    static ExecutorService es = Executors.newCachedThreadPool();
 
     // debugging flag to unable or disable log
     final static boolean DEBUG = true;
@@ -59,14 +62,15 @@ class AuthCred {
 
 }
 
-public class PatelP1MidServer extends CommonData {
-
-    static ExecutorService es = Executors.newCachedThreadPool();
+public class PatelP1MidServer extends CommonMidData {
 
     public static void main(String[] args) throws IOException {
 
-        ServerSocket ss = new ServerSocket(19667);
         Scanner scan = new Scanner(System.in);
+        System.out.print("Enter New Mid-Server port: ");
+        int port = 19675;// scan.nextInt();//
+        System.out.println("Port selected " + port);
+        ServerSocket ss = new ServerSocket(port);
         Scanner authScan = new Scanner(new File("userList.txt")).useDelimiter("[\\r\\n\\|]+");
 
         // scan the authentication file to load all creds in a list
@@ -80,37 +84,39 @@ public class PatelP1MidServer extends CommonData {
             // + AUTH_LIST.get(user).matchPassword(new String(pass)));
         }
 
-        authScan.close();
-        // Add Groups based on port numbers
-        boolean exit_flag = false;
-        while (!exit_flag) {
-            System.out.println("Enter group ip:port or 0 to complete: ");
-            String input = scan.next();
-            char choice = input.charAt(0);
-            switch (choice) {
-                case '0':
-                    exit_flag = true;
+        // authScan.close();
+        // Add Groups after validating connection
+        while (true) {
+            try {
+                System.out.print(
+                        "Enter New Group <ip addr>:<port>\nPRESS 0 to finish loading group\nEnter your choice: ");
+                String input = scan.nextLine();
+                // debug(input);
+                char choice = input.charAt(0);
+                if (choice == '0')
                     break;
-                default:
+                else
                     try {
-                        int temp_port = Integer.parseInt(input.split(":")[1]);
-                        Socket temp_sock = new Socket(input.split(":")[0], temp_port);
-                        GROUP_LIST.put(temp_port, temp_sock);
+                        // int temp_port = Integer.parseInt(input.split(":")[1]);
+                        Socket temp_sock = new Socket(input.split(":")[0], Integer.parseInt(input.split(":")[1]));
+                        GROUP_LIST.put(input, input);
+                        temp_sock.close();
                     } catch (Exception e) {
-                        System.out.println("Failed to add group");
+                        System.out.println("❌ Failed to add Group(" + input + ")");
+                    } finally {
                     }
-                    break;
+            } catch (Exception e) {
+                System.out.println("❌ Invalid Input");
             }
         }
 
-        int x = 2;
-        while (1 == x) {
+        while (true) {
             Socket s = null;
             try {
-                System.out.println("Waiting for clients to join 🕓");
+                System.out.println("🕓 Waiting for clients to join");
                 s = ss.accept();
 
-                System.out.println("A new client is connected : " + s);
+                System.out.println("🥳 A new client is connected : " + s);
                 DataInputStream dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
@@ -118,7 +124,7 @@ public class PatelP1MidServer extends CommonData {
                 es.execute(temp_login);
 
             } catch (Exception e) {
-                System.out.println("Error connecting to 1 client ");
+                System.out.println("❌ Error connecting to a client.");
                 // e.printStackTrace();
             }
         }
@@ -128,7 +134,7 @@ public class PatelP1MidServer extends CommonData {
 
 }
 
-class MyNode extends CommonData implements Runnable {
+class MyNode extends CommonMidData implements Runnable {
 
     final Socket s;
     final DataInputStream dis;
@@ -143,60 +149,121 @@ class MyNode extends CommonData implements Runnable {
 
     public void run() {
 
-        String option = "", temp_user = "", temp_pass = "";
+        String option = "", temp_user = "", temp_pass = "", group_ports = "";
         boolean entered = false;
-        while (true) {
-            try {
+        for (Map.Entry<String, String> set : GROUP_LIST.entrySet()) {
+            group_ports += set.getValue() + "\n";
+        }
 
-                String menu = "";
-                if (!entered) {
-                    menu += "Connected to Main Server\n";
-                    entered = true;
+        String menu = "";
+        // login loop till not logged in
+        while (!loginFlag) {
+            menu += "--- Mid Server ---\n";
+            if (!entered) {
+                menu += "✅ Connected to Main Server\n";
+                entered = true;
+            }
+            menu += "Press 1 to Login\nPress CLOSE to Exit\nOption: ";
+            try {
+                dos.writeUTF(menu);
+                option = dis.readUTF();
+                if (option.trim().equalsIgnoreCase("1") && !loginFlag) {
+                    // Ask user for username
+                    dos.writeUTF("👤 username: ");
+                    temp_user = dis.readUTF();
+                    dos.writeUTF("🔑 password: ");
+                    temp_pass = dis.readUTF();
+                    loginFlag = AUTH_LIST.get(temp_user) != null &&
+                            AUTH_LIST.get(temp_user).matchPassword(temp_pass);
+                    if (loginFlag) {
+                        break;
+                    } else {
+                        menu = "❌ Invalid credentials\n";
+                    }
                 }
 
-                // show menu
-                menu += !loginFlag ? "1 - Login" : "Logged in as " + temp_user;
+            } catch (Exception e) {
+                debug("❌ Error while trying to send/receive data from client");
+            }
+        }
+        System.out.println("✅ Client login complete");
+        // menu = "";
+
+        while (s.isConnected()) {
+            try {
+                menu = "Logged in as " + temp_user +
+                        group_ports;
                 menu += "\nCLOSE - Exit\nOption: ";
                 dos.writeUTF(menu);
                 option = dis.readUTF();
-
-                // server never breaks
-                if (option.trim().equalsIgnoreCase("???"))
+                // if input is group ip and port
+                if (GROUP_LIST.get(option) != null) {
+                    System.out.println("Client has connected to client this thread can close");
                     break;
-                else if (option.trim().equalsIgnoreCase("1") && !loginFlag) {
-                    // Ask user for username
-                    dos.writeUTF("username: ");
-                    temp_user = dis.readUTF();
-                    dos.writeUTF("password: ");
-                    temp_pass = dis.readUTF();
-                    loginFlag = AUTH_LIST.get(temp_user) != null && AUTH_LIST.get(temp_user).matchPassword(temp_pass);
                 }
-
-                if (loginFlag) {
-                    String temp_menu = "Login Success\n";
-                    System.out.print(temp_menu);
-                    for (Map.Entry<Integer, Socket> set : GROUP_LIST.entrySet()) {
-                        temp_menu += set.getKey() + "\n";
-                    }
-                    temp_menu += "Enter Group port: ";
-                    dos.writeUTF(temp_menu);
-                    temp_pass = dis.readUTF();
-
-                } else {
-                    System.out.println("Login Failed for username(" + temp_user + ") pass(" + temp_pass + ")");
-                }
-            } catch (IOException e) {
-                System.out.println("Closing client thread.");
-                break;
-                // e.printStackTrace();
+            } catch (Exception e) {
+                debug("❌ Error while trying to send/receive data from client");
             }
         }
+
+        // while (!s.isClosed()) {
+        // try {
+
+        // String menu = "";
+        // if (!entered) {
+        // menu += "Connected to Main Server\n";
+        // entered = true;
+        // }
+
+        // // show menu
+        // menu += !loginFlag ? "1 - Login" : "Logged in as " + temp_user + "\n" +
+        // group_ports;
+        // menu += "\nCLOSE - Exit\nOption: ";
+        // dos.writeUTF(menu);
+        // option = dis.readUTF();
+
+        // // server never breaks
+        // if (option.trim().equalsIgnoreCase("???"))
+        // break;
+        // else if (option.trim().equalsIgnoreCase("1") && !loginFlag) {
+        // // Ask user for username
+        // dos.writeUTF("username: ");
+        // temp_user = dis.readUTF();
+        // dos.writeUTF("password: ");
+        // temp_pass = dis.readUTF();
+        // loginFlag = AUTH_LIST.get(temp_user) != null &&
+        // AUTH_LIST.get(temp_user).matchPassword(temp_pass);
+        // }
+
+        // if (loginFlag) {
+        // String temp_menu = "Login Success\n";
+        // System.out.print(temp_menu);
+        // temp_menu += group_ports;
+        // temp_menu += "Enter Group port: ";
+        // dos.writeUTF(temp_menu);
+        // temp_pass = dis.readUTF();
+        // // if input is group ip and port
+        // if (GROUP_LIST.get(temp_pass) != null) {
+        // System.out.println("Client has connected to client this thread can close");
+        // break;
+        // }
+        // } else {
+        // System.out.println("Login Failed for username(" + temp_user + ") pass(" +
+        // temp_pass + ")");
+        // }
+        // } catch (IOException e) {
+        // System.out.println("Closing client thread.");
+        // break;
+        // // e.printStackTrace();
+        // }
+        // }
 
         try {
             // closing resources
             this.dis.close();
             this.dos.close();
-
+            this.s.close();
+            System.out.println("Closed this client");
         } catch (IOException e) {
             // e.printStackTrace();
         }
