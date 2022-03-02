@@ -71,10 +71,10 @@ class CommonGroupData {
         if (GroupTypeId < 0 || GroupTypeId > 2) {
             return "Invalid Group choice";
         }
-        String temp = "Sr No.\tID\t\tItem Name\tQty\n";
+        String temp = "Sr No.\tID\tItem Name\tQty\n";
         for (int i = 0; i < items[GroupTypeId].length; i++) {
-            temp += (i + 1) + ".\t" + items[GroupTypeId][i].itemId + "\t" + items[GroupTypeId][i].itemName + "\t"
-                    + items[GroupTypeId][i].qty + "\t"
+            temp += (i + 1) + ".\t" + items[GroupTypeId][i].itemId + "\t" + items[GroupTypeId][i].itemName + "\t\t"
+                    + items[GroupTypeId][i].qty
                     + "\n";
         }
 
@@ -111,7 +111,7 @@ public class PatelP1GroupServer extends CommonGroupData {
                         + shopName[GroupTypeId].substring(1) + " Group(" + port + ") Scanning...");
                 s = ss.accept();
 
-                System.out.println("🔗 Mid Server(" + s.getInetAddress() + ":" + s.getPort() + ") is connected : " + s);
+                System.out.println("🔗 Mid Server(" + s.getInetAddress() + ":" + s.getPort() + ") is connected");
                 DataInputStream dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
@@ -142,7 +142,8 @@ class GroupNode extends CommonGroupData implements Runnable {
                 dos.writeUTF(shopName[GroupTypeId]);
                 String menu = "";
                 if (!entered) {
-                    menu += "Welcome to Group(" + port + ") Server\n";
+                    menu += "Welcome to " + shopName[GroupTypeId].substring(0, 1).toUpperCase()
+                            + shopName[GroupTypeId].substring(1) + "Group(" + port + ") Server\n";
                     entered = true;
                 }
                 menu += printMenu();
@@ -150,7 +151,7 @@ class GroupNode extends CommonGroupData implements Runnable {
                 System.out.println(dis.readUTF());
             }
         } catch (Exception e) {
-            System.out.println("❌ Connection closed by client.");
+            System.out.println("❌ Connection closed by Mid Server.");
         }
     }
 }

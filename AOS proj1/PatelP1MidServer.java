@@ -109,7 +109,7 @@ public class PatelP1MidServer extends CommonMidData {
         while (true) {
             try {
                 System.out.print(
-                        "Enter Group host:port \nPRESS 0 to finish loading group\nEnter your choice: ");
+                        "Enter Group <ip addr>:<port> or 0 to finish: ");
                 String input = scan.nextLine();
                 debug(input);
                 if (input.charAt(0) == '0')
@@ -133,12 +133,13 @@ public class PatelP1MidServer extends CommonMidData {
             }
         }
 
+        // keep on scanning fro client
         while (true) {
             Socket s = null;
             try {
                 System.out.println("📶  Scanning...");
                 s = ss.accept();
-                System.out.println("🔗 client(" + s.getLocalPort() + ") is connected : " + s);
+                System.out.println("🔗 client(" + s.getInetAddress() + ":" + s.getPort() + ") is connected : " + s);
                 DataInputStream dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
@@ -204,6 +205,7 @@ class MyNode extends CommonMidData implements Runnable {
         }
         System.out.println("✅ Client(" + s.getPort() + ") login complete");
 
+        debug(!s.isClosed() + " - " + !GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).socket.isClosed());
         // communication establishing between GROUP and CLIENT
         while (!s.isClosed() && !GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).socket.isClosed()) {
             try {
@@ -212,9 +214,10 @@ class MyNode extends CommonMidData implements Runnable {
                 if (client_input.contains("CLOSE"))
                     break;
                 GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).dos
-                        .writeUTF("Client (" + s.getPort() + ") :" + client_input);
+                        .writeUTF("Client(" + s.getLocalAddress() + ":" + s.getPort() + ") :" + client_input);
             } catch (Exception e) {
                 System.out.println("❌ Error between client and group");
+                break;
             }
         }
 

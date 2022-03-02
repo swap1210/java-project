@@ -67,16 +67,16 @@ public class PatelP1Sender {
                 dos.writeUTF(tosend);
             }
 
-            // obtaining input and out streams from Mid server
-            dis = new DataInputStream(group_socket.getInputStream());
-            dos = new DataOutputStream(group_socket.getOutputStream());
+            // // obtaining input and out streams from Mid server
+            // dis = new DataInputStream(group_socket.getInputStream());
+            // dos = new DataOutputStream(group_socket.getOutputStream());
 
-            // final group connection loop
-            while (group_socket != null) {
+            // // final group connection loop
+            // while (group_socket != null) {
 
-                System.out.println(dis.readUTF());
-                dos.writeUTF(scn.nextLine());
-            }
+            // System.out.println(dis.readUTF());
+            // dos.writeUTF(scn.nextLine());
+            // }
 
             // closing resources
             try {
