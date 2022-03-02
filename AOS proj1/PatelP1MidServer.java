@@ -111,9 +111,8 @@ public class PatelP1MidServer extends CommonMidData {
                 System.out.print(
                         "Enter Group host:port \nPRESS 0 to finish loading group\nEnter your choice: ");
                 String input = scan.nextLine();
-                // debug(input);
-                char choice = input.charAt(0);
-                if (choice == '0')
+                debug(input);
+                if (input.charAt(0) == '0')
                     break;
                 else {
                     try {
@@ -123,7 +122,8 @@ public class PatelP1MidServer extends CommonMidData {
                         DataOutputStream temp_dos = new DataOutputStream(temp_sock.getOutputStream());
                         String temp_groupName = temp_dis.readUTF();
                         GROUP_LIST.put(temp_groupName, new GroupDetails(temp_sock, temp_dis, temp_dos));
-                        System.out.println("➕ Group(" + GROUP_LIST.get(temp_groupName).socket.getPort() + ") Added");
+                        System.out.println("➕ Group(" + GROUP_LIST.get(temp_groupName).socket.getInetAddress() + ":"
+                                + GROUP_LIST.get(temp_groupName).socket.getPort() + ") Added");
                     } catch (Exception e) {
                         System.out.println("❌ Failed to add Group(" + input + ")");
                     }

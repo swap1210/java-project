@@ -111,7 +111,7 @@ public class PatelP1GroupServer extends CommonGroupData {
                         + shopName[GroupTypeId].substring(1) + " Group(" + port + ") Scanning...");
                 s = ss.accept();
 
-                System.out.println("🔗 Mid Server(" + s.getPort() + ") is connected : " + s);
+                System.out.println("🔗 Mid Server(" + s.getInetAddress() + ":" + s.getPort() + ") is connected : " + s);
                 DataInputStream dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
