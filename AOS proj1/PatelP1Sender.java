@@ -1,4 +1,9 @@
 
+//*********************************************************
+//**** Name: Swapnil Patel. Id: 1966690. Course: AOS
+//**** Project-1, Date: 02/24/2022
+//*********************************************************
+
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
@@ -11,14 +16,19 @@ public class PatelP1Sender {
         try {
             Scanner scn = new Scanner(System.in);
 
-            // establish the connection with server port 19675
-            System.out.print("Enter Mid-server <ip addr>:<port> ");
-            String temp = scn.nextLine();// "localhost";//
+            // establish the connection with Mid Server port
+            String temp = "";
+            while (!temp.contains(":")) {
+                System.out.print("Enter Mid-server <ip addr>:<port> ");
+                temp = scn.nextLine();// "localhost";//
+                if (!temp.contains(":")) {
+                    System.out.println("❌ Invalid Input");
+                    continue;
+                }
+            }
             String serverip = temp.split(":")[0]; // scn.nextLine();// "localhost";
-            // System.out.print("Enter Mid-server port: ");
             String serverport = temp.split(":")[1]; // scn.nextLine();// "localhost";
-            // System.out.println();
-            Socket s = new Socket((serverip.equals("") ? "localhost" : serverip), Integer.parseInt(serverport));
+            Socket s = new Socket(serverip, Integer.parseInt(serverport));
             // obtaining input and out streams from Mid server
             DataInputStream dis = new DataInputStream(s.getInputStream());
             DataOutputStream dos = new DataOutputStream(s.getOutputStream());
@@ -26,13 +36,17 @@ public class PatelP1Sender {
             // the following loop performs the exchange of
             // information between client and client handler
             while (true) {
-                String tosend = "";
-                System.out.print(dis.readUTF());
-                tosend = scn.nextLine();
+                String serverInput = dis.readUTF();
+                if (serverInput.equalsIgnoreCase("silver") || serverInput.equalsIgnoreCase("gold")
+                        || serverInput.equalsIgnoreCase("platinum")) {
+                    serverInput = dis.readUTF();
+                }
+                System.out.print(serverInput);
+                String tosend = scn.nextLine();
 
                 // If client sends CLOSE,close this connection
                 // and then break from the while loop
-                if (tosend.equalsIgnoreCase("CLOSE")) {
+                if (tosend.contains("CLOSE")) {
                     System.out.println("Closing this connection : " + s);
                     s.close();
                     // System.out.println("Connection closed");
