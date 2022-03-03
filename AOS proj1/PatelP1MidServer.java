@@ -8,6 +8,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -70,13 +71,13 @@ class AuthCred {
 public class PatelP1MidServer extends CommonMidData {
 
     public static void main(String[] args) throws IOException {
-
+        String ms_ip = InetAddress.getLocalHost().toString().split("/")[1];
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter New Mid-Server port: ");
         int port = Integer.parseInt(scan.nextLine());// 81;//
         System.out.println("Port selected " + port);
         ServerSocket ss = new ServerSocket(port);
-        System.out.println("Mid Server IP " + ss.getLocalSocketAddress());
+        System.out.println("Enter Mid-Server IP " + ms_ip + ":" + port);
         Scanner authScan = new Scanner(new File("userList.txt")).useDelimiter("[\\r\\n\\|]+");
 
         // scan the authentication file to load all creds in a list
@@ -197,7 +198,7 @@ class MyNode extends CommonMidData implements Runnable {
                 String client_input = dis.readUTF();
                 if (client_input.contains("CLOSE"))
                     break;
-                g_dos.writeUTF("Sender(" + s.getLocalAddress() + ":" + s.getPort() + ") : " + client_input);
+                g_dos.writeUTF("Sender(" + s.getLocalAddress() + ":" + s.getPort() + ") :" + client_input);
 
             }
         } catch (Exception e) {

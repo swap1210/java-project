@@ -22,7 +22,7 @@ public class PatelP1Sender {
             // establish the connection with Mid Server port
             String temp = "";
             while (!temp.contains(":")) {
-                System.out.print("Enter Mid-server <ip addr>:<port> ");
+                System.out.print("Enter Mid-Server IP: ");
                 temp = scn.nextLine();// "localhost:81";//
                 if (!temp.contains(":")) {
                     System.out.println("❌ Invalid Input");
@@ -68,7 +68,7 @@ public class PatelP1Sender {
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Connection Error");
         }
     }
 

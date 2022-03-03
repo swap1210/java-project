@@ -68,6 +68,9 @@ class CommonGroupData {
         }
         String temp = "Sr No.\tID\tItem Name\tQty\n";
         for (int i = 0; i < items[GroupTypeId].length; i++) {
+            // skip 0 qty
+            if (items[GroupTypeId][i].qty <= 0)
+                continue;
             temp += (i + 1) + ".\t" + items[GroupTypeId][i].itemId + "\t" + items[GroupTypeId][i].itemName + "\t\t"
                     + items[GroupTypeId][i].qty
                     + "\n";
@@ -84,12 +87,11 @@ public class PatelP1GroupServer extends CommonGroupData {
         DataInputStream ms_soc_dis = null;
         DataOutputStream ms_soc_dos = null;
         Scanner scn = new Scanner(System.in);
-        System.out.print("Enter New Group port: ");
 
         // establish the connection with Mid Server port
         String temp = "";
         while (!temp.contains(":")) {
-            System.out.print("Enter Mid-server <ip addr>:<port> ");
+            System.out.print("Enter Mid-Server IP: ");
             temp = scn.nextLine();// "localhost:81";//
             if (!temp.contains(":")) {
                 System.out.println("❌ Invalid Input");
@@ -134,7 +136,19 @@ public class PatelP1GroupServer extends CommonGroupData {
                 menu += printMenu();
                 // System.out.println("Sending " + menu);
                 dos.writeUTF(menu);
-                System.out.println(dis.readUTF());
+                String clientInput = dis.readUTF();
+                System.out.println(clientInput);
+                try {
+                    int choice = Integer.parseInt(clientInput.split(":")[2]) - 1;
+                    synchronized (items) {
+                        if (choice >= 0)
+                            items[GroupTypeId][choice].qty--;
+                        System.out.println(clientInput.substring(0, clientInput.lastIndexOf(':')) + "Purchased "
+                                + items[GroupTypeId][choice].itemName);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Weird Message" + e.getMessage());
+                }
             }
 
             ms_soc.close();
@@ -142,39 +156,6 @@ public class PatelP1GroupServer extends CommonGroupData {
             ms_soc_dos.close();
         } catch (Exception e) {
             System.out.println("Connection closed abruptly");
-        }
-    }
-}
-
-class GroupNode extends CommonGroupData implements Runnable {
-    final Socket s;
-    final DataInputStream dis;
-    final DataOutputStream dos;
-
-    public GroupNode(Socket s, DataInputStream dis, DataOutputStream dos) {
-        this.dis = dis;
-        this.dos = dos;
-        this.s = s;
-    }
-
-    public void run() {
-        boolean entered = false;
-
-        try {
-            while (true) {
-                String menu = "";
-                if (!entered) {
-                    menu += shopName[GroupTypeId] + ": Welcome to "
-                            + shopName[GroupTypeId].substring(0, 1).toUpperCase()
-                            + shopName[GroupTypeId].substring(1) + "Group() Server\n";
-                    entered = true;
-                }
-                menu += printMenu();
-                dos.writeUTF(menu);
-                System.out.println(dis.readUTF());
-            }
-        } catch (Exception e) {
-            System.out.println("❌ Connection closed by Mid Server.");
         }
     }
 }
