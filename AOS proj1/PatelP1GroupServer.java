@@ -4,11 +4,11 @@
 //**** Project-1, Date: 02/24/2022
 //*********************************************************
 
-import java.io.*;
-import java.net.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 class Item {
     String itemId;
@@ -29,7 +29,7 @@ class CommonGroupData {
     final static boolean DEBUG = false;
 
     static int GroupTypeId = -1;
-    static String shopName[] = { "gold", "silver", "platinum" };
+    static String shopName[] = { "Gold", "Silver", "Platinum" };
     static Item items[][] = { {
             new Item("16-931-5891", "Eagle", 15),
             new Item("35-563-0816", "Subaru", 13),
@@ -57,17 +57,12 @@ class CommonGroupData {
                     new Item("27-568-7449", "Dextromethorphan", 1),
             } };
 
-    // Initializing thread pool
-    static ExecutorService es = Executors.newCachedThreadPool();
-
-    static int port;
-
     static void debug(String s) {
         if (DEBUG)
             System.out.println("D: " + s);
     }
 
-    String printMenu() {
+    static String printMenu() {
         if (GroupTypeId < 0 || GroupTypeId > 2) {
             return "Invalid Group choice";
         }
@@ -83,10 +78,32 @@ class CommonGroupData {
 }
 
 public class PatelP1GroupServer extends CommonGroupData {
+
     public static void main(String[] args) throws IOException {
+        Socket ms_soc = null;
+        DataInputStream ms_soc_dis = null;
+        DataOutputStream ms_soc_dos = null;
         Scanner scn = new Scanner(System.in);
         System.out.print("Enter New Group port: ");
-        port = scn.nextInt();
+
+        // establish the connection with Mid Server port
+        String temp = "";
+        while (!temp.contains(":")) {
+            System.out.print("Enter Mid-server <ip addr>:<port> ");
+            temp = scn.nextLine();// "localhost:81";//
+            if (!temp.contains(":")) {
+                System.out.println("❌ Invalid Input");
+                continue;
+            }
+        }
+
+        String serverip = temp.split(":")[0]; // scn.nextLine();// "localhost";
+        String serverport = temp.split(":")[1]; // scn.nextLine();// "localhost";
+        ms_soc = new Socket(serverip, Integer.parseInt(serverport));
+        // obtaining input and out streams from Mid server
+        ms_soc_dis = new DataInputStream(ms_soc.getInputStream());
+        ms_soc_dos = new DataOutputStream(ms_soc.getOutputStream());
+
         int option = -1;
         while (option < 0 || option > 2) {
             System.out.println("Select Group preset:");
@@ -103,22 +120,28 @@ public class PatelP1GroupServer extends CommonGroupData {
             }
         }
 
-        ServerSocket ss = new ServerSocket(port);
-        while (true) {
-            Socket s = null;
-            try {
-                System.out.println("📶 " + shopName[GroupTypeId].substring(0, 1).toUpperCase()
-                        + shopName[GroupTypeId].substring(1) + " Group(" + port + ") Scanning...");
-                s = ss.accept();
+        try {
+            System.out.println("📶 " + shopName[GroupTypeId].substring(0, 1).toUpperCase()
+                    + shopName[GroupTypeId].substring(1) + " Group Scanning...");
 
-                System.out.println("🔗 Mid Server(" + s.getInetAddress() + ":" + s.getPort() + ") is connected");
-                DataInputStream dis = new DataInputStream(s.getInputStream());
-                DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+            System.out.println("🔗 Mid Server(" + ms_soc.getInetAddress() + ":" + ms_soc.getPort() + ") is connected");
+            DataInputStream dis = new DataInputStream(ms_soc.getInputStream());
+            DataOutputStream dos = new DataOutputStream(ms_soc.getOutputStream());
 
-                Runnable temp_login = new GroupNode(s, dis, dos);
-                es.execute(temp_login);
-            } catch (Exception e) {
+            while (!ms_soc.isClosed()) {
+                String menu = "";
+                menu += shopName[GroupTypeId] + ": Welcome to Group Server\n";
+                menu += printMenu();
+                // System.out.println("Sending " + menu);
+                dos.writeUTF(menu);
+                System.out.println(dis.readUTF());
             }
+
+            ms_soc.close();
+            ms_soc_dis.close();
+            ms_soc_dos.close();
+        } catch (Exception e) {
+            System.out.println("Connection closed abruptly");
         }
     }
 }
@@ -139,11 +162,11 @@ class GroupNode extends CommonGroupData implements Runnable {
 
         try {
             while (true) {
-                dos.writeUTF(shopName[GroupTypeId]);
                 String menu = "";
                 if (!entered) {
-                    menu += "Welcome to " + shopName[GroupTypeId].substring(0, 1).toUpperCase()
-                            + shopName[GroupTypeId].substring(1) + "Group(" + port + ") Server\n";
+                    menu += shopName[GroupTypeId] + ": Welcome to "
+                            + shopName[GroupTypeId].substring(0, 1).toUpperCase()
+                            + shopName[GroupTypeId].substring(1) + "Group() Server\n";
                     entered = true;
                 }
                 menu += printMenu();

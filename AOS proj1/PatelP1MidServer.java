@@ -20,7 +20,7 @@ class CommonMidData {
 
     // authentication details
     static Map<String, AuthCred> AUTH_LIST = new HashMap<String, AuthCred>();
-    static Map<String, GroupDetails> GROUP_LIST = new HashMap<String, GroupDetails>();
+    static Map<String, Socket> GROUP_LIST = new HashMap<String, Socket>();
 
     static ExecutorService es = Executors.newCachedThreadPool();
 
@@ -67,31 +67,13 @@ class AuthCred {
 
 }
 
-class GroupDetails {
-    Socket socket;
-    DataInputStream dis;
-    DataOutputStream dos;
-
-    public GroupDetails(Socket socket, DataInputStream dis, DataOutputStream dos) {
-        this.socket = socket;
-        this.dis = dis;
-        this.dos = dos;
-    }
-
-    @Override
-    public String toString() {
-        return "GroupDetails [dis=" + dis + ", dos=" + dos + ", socket=" + socket + "]";
-    }
-
-}
-
 public class PatelP1MidServer extends CommonMidData {
 
     public static void main(String[] args) throws IOException {
 
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter New Mid-Server port: ");
-        int port = Integer.parseInt(scan.nextLine());// 19675;//
+        int port = Integer.parseInt(scan.nextLine());// 81;//
         System.out.println("Port selected " + port);
         ServerSocket ss = new ServerSocket(port);
         System.out.println("Mid Server IP " + ss.getLocalSocketAddress());
@@ -105,46 +87,25 @@ public class PatelP1MidServer extends CommonMidData {
             AUTH_LIST.put(user, new AuthCred(user, pass, group));
         }
 
-        // Add Groups after validating connection
-        while (true) {
-            try {
-                System.out.print(
-                        "Enter Group <ip addr>:<port> or 0 to finish: ");
-                String input = scan.nextLine();
-                debug(input);
-                if (input.charAt(0) == '0')
-                    break;
-                else {
-                    try {
-                        // int temp_port = Integer.parseInt(input.split(":")[1]);
-                        Socket temp_sock = new Socket(input.split(":")[0], Integer.parseInt(input.split(":")[1]));
-                        DataInputStream temp_dis = new DataInputStream(temp_sock.getInputStream());
-                        DataOutputStream temp_dos = new DataOutputStream(temp_sock.getOutputStream());
-                        String temp_groupName = temp_dis.readUTF();
-                        GROUP_LIST.put(temp_groupName, new GroupDetails(temp_sock, temp_dis, temp_dos));
-                        System.out.println("➕ Group(" + GROUP_LIST.get(temp_groupName).socket.getInetAddress() + ":"
-                                + GROUP_LIST.get(temp_groupName).socket.getPort() + ") Added");
-                    } catch (Exception e) {
-                        System.out.println("❌ Failed to add Group(" + input + ")");
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("❌ Invalid Input");
-            }
-        }
-
-        // keep on scanning fro client
+        authScan.close();
+        // keep on scanning for client
         while (true) {
             Socket s = null;
             try {
                 System.out.println("📶  Scanning...");
                 s = ss.accept();
-                System.out.println("🔗 client(" + s.getInetAddress() + ":" + s.getPort() + ") is connected : " + s);
-                DataInputStream dis = new DataInputStream(s.getInputStream());
-                DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-
-                Runnable temp_login = new MyNode(s, dis, dos);
-                es.execute(temp_login);
+                String first_msg = new DataInputStream(s.getInputStream()).readUTF();
+                if (first_msg.contains("Silver:") || first_msg.contains("Gold:") || first_msg.contains("Platinum:")) {
+                    String temp_groupName = first_msg.split(":")[0];
+                    GROUP_LIST.put(temp_groupName, s);
+                    System.out.println(
+                            "➕ " + temp_groupName + " Group(" + GROUP_LIST.get(temp_groupName).getInetAddress() + ":"
+                                    + GROUP_LIST.get(temp_groupName).getPort() + ") Added");
+                } else {
+                    System.out.println("🔗 Sender(" + s.getInetAddress() + ":" + s.getPort() + ") is connected");
+                    Runnable temp_login = new MyNode(s);
+                    es.execute(temp_login);
+                }
 
             } catch (Exception e) {
                 System.out.println("❌ Error connecting to a client.");
@@ -161,10 +122,10 @@ class MyNode extends CommonMidData implements Runnable {
     final DataOutputStream dos;
     boolean loginFlag = false;
 
-    public MyNode(Socket s, DataInputStream dis, DataOutputStream dos) {
-        this.dis = dis;
-        this.dos = dos;
+    public MyNode(Socket s) throws IOException {
         this.s = s;
+        this.dis = new DataInputStream(s.getInputStream());
+        this.dos = new DataOutputStream(s.getOutputStream());
     }
 
     public void run() {
@@ -179,15 +140,15 @@ class MyNode extends CommonMidData implements Runnable {
                 menu += "🔗 Connected to Main Server\n";
                 entered = true;
             }
-            menu += "Press 1 to Login\nPress CLOSE to Exit\nOption: ";
+            menu += "Press 1 to Login\nPress CLOSE to Exit\n";
             try {
                 dos.writeUTF(menu);
                 option = dis.readUTF();
                 if (option.trim().equalsIgnoreCase("1") && !loginFlag) {
                     // Ask user for username
-                    dos.writeUTF("👤 username: ");
+                    dos.writeUTF("👤 Send username ");
                     temp_user = dis.readUTF();
-                    dos.writeUTF("🔑 password: ");
+                    dos.writeUTF("🔑 Send password ");
                     temp_pass = dis.readUTF();
                     loginFlag = AUTH_LIST.get(temp_user) != null &&
                             AUTH_LIST.get(temp_user).matchPassword(temp_pass);
@@ -197,28 +158,50 @@ class MyNode extends CommonMidData implements Runnable {
                         menu = "❌ Invalid credentials\n";
                     }
                 }
-
             } catch (Exception e) {
                 debug("❌ Error while trying to send/receive data from client");
-                break;
+                return;
             }
         }
-        System.out.println("✅ Client(" + s.getPort() + ") login complete");
+        System.out.println("✅ Sender(" + s.getPort() + ") login complete");
 
-        debug(!s.isClosed() + " - " + !GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).socket.isClosed());
-        // communication establishing between GROUP and CLIENT
-        while (!s.isClosed() && !GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).socket.isClosed()) {
+        // find group in the list
+        Socket selected_Group = null;
+        DataInputStream g_dis = null;
+        DataOutputStream g_dos = null;
+        try {
+            selected_Group = GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName());
+            g_dis = new DataInputStream(selected_Group.getInputStream());
+            g_dos = new DataOutputStream(selected_Group.getOutputStream());
+        } catch (Exception e) {
+            debug("❌ Unavailable Group Server");
             try {
-                dos.writeUTF(GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).dis.readUTF());
+                dos.writeUTF("❌ " + AUTH_LIST.get(temp_user).getGroupName() + " Group Server was unavailable\n");
+                s.close();
+            } catch (IOException e1) {
+            }
+            return;
+        }
+
+        // check if the group exist in the mid server or not
+        if (s != null && selected_Group != null)
+            debug(!s.isClosed() + " - " + !selected_Group.isClosed());
+
+        try {
+            // send welcome message to connected Client
+            g_dos.writeUTF("Sender(" + s.getLocalAddress() + ":" + s.getPort() + ") Requested Quote");
+            // communication establishing between GROUP and CLIENT
+            while (!s.isClosed() && !selected_Group.isClosed()) {
+                String group_input = g_dis.readUTF();
+                dos.writeUTF(group_input);
                 String client_input = dis.readUTF();
                 if (client_input.contains("CLOSE"))
                     break;
-                GROUP_LIST.get(AUTH_LIST.get(temp_user).getGroupName()).dos
-                        .writeUTF("Client(" + s.getLocalAddress() + ":" + s.getPort() + ") :" + client_input);
-            } catch (Exception e) {
-                System.out.println("❌ Error between client and group");
-                break;
+                g_dos.writeUTF("Sender(" + s.getLocalAddress() + ":" + s.getPort() + ") : " + client_input);
+
             }
+        } catch (Exception e) {
+            System.out.println("❌ Error between client and group");
         }
 
         try {

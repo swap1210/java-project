@@ -1,8 +1,8 @@
-anna|a86H6T0c|silver
-barbara|G6M7p8az|silver
-cathie|Pd82bG57|gold
-dohas|jO79bNs1|gold
-eli|uCh781fY|platinum
-farah|Cfw61RqV|platinum
-shaz|Kuz07YLv|platinum
-s|p|silver
+anna|a86H6T0c|Silver
+barbara|G6M7p8az|Silver
+cathie|Pd82bG57|Gold
+dohas|jO79bNs1|Gold
+eli|uCh781fY|Platinum
+farah|Cfw61RqV|Platinum
+shaz|Kuz07YLv|Platinum
+s|p|Silver
