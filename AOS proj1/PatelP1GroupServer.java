@@ -94,7 +94,7 @@ public class PatelP1GroupServer extends CommonGroupData {
             System.out.print("Enter Mid-Server IP: ");
             temp = scn.nextLine();// "localhost:81";//
             if (!temp.contains(":")) {
-                System.out.println("❌ Invalid Input");
+                System.out.println("Invalid Input");
                 continue;
             }
         }
@@ -115,7 +115,7 @@ public class PatelP1GroupServer extends CommonGroupData {
             System.out.println("Option: ");
             option = scn.nextInt();
             if (option < 0 || option > 2) {
-                System.out.println("❌ Invalid Input!");
+                System.out.println("Invalid Input!");
                 continue;
             } else {
                 GroupTypeId = option;
