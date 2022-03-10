@@ -25,7 +25,7 @@ public class PatelP1Sender {
                 System.out.print("Enter Mid-Server IP: ");
                 temp = scn.nextLine();// "localhost:81";//
                 if (!temp.contains(":")) {
-                    System.out.println("❌ Invalid Input");
+                    System.out.println("Invalid Input");
                     continue;
                 }
             }

@@ -109,7 +109,7 @@ public class PatelP1MidServer extends CommonMidData {
                 }
 
             } catch (Exception e) {
-                System.out.println("❌ Error connecting to a client.");
+                System.out.println("Error connecting to a client.");
             }
         }
     }
@@ -156,11 +156,11 @@ class MyNode extends CommonMidData implements Runnable {
                     if (loginFlag) {
                         break;
                     } else {
-                        menu = "❌ Invalid credentials\n";
+                        menu = "Invalid credentials\n";
                     }
                 }
             } catch (Exception e) {
-                debug("❌ Error while trying to send/receive data from client");
+                debug("Error while trying to send/receive data from client");
                 return;
             }
         }
@@ -175,9 +175,9 @@ class MyNode extends CommonMidData implements Runnable {
             g_dis = new DataInputStream(selected_Group.getInputStream());
             g_dos = new DataOutputStream(selected_Group.getOutputStream());
         } catch (Exception e) {
-            debug("❌ Unavailable Group Server");
+            debug("Unavailable Group Server");
             try {
-                dos.writeUTF("❌ " + AUTH_LIST.get(temp_user).getGroupName() + " Group Server was unavailable\n");
+                dos.writeUTF(AUTH_LIST.get(temp_user).getGroupName() + " Group Server was unavailable\n");
                 s.close();
             } catch (IOException e1) {
             }
@@ -202,7 +202,7 @@ class MyNode extends CommonMidData implements Runnable {
 
             }
         } catch (Exception e) {
-            System.out.println("❌ Error between client and group");
+            System.out.println("Error between client and group");
         }
 
         try {
