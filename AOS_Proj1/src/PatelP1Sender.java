@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class PatelP1Sender {
 
-    public static void execute() {
+    public static void main(String[] s) {
 
         // mid server socket
         Socket ms_soc = null;

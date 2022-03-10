@@ -26,7 +26,7 @@ class CommonMidData {
     static ExecutorService es = Executors.newCachedThreadPool();
 
     // debugging flag to unable or disable log
-    final static boolean DEBUG = true;
+    final static boolean DEBUG = false;
 
     static void debug(String s) {
         if (DEBUG)
@@ -70,7 +70,7 @@ class AuthCred {
 
 public class PatelP1MidServer extends CommonMidData {
 
-    public static void execute() throws IOException {
+    public static void main(String[] ss1) throws IOException {
         String ms_ip = InetAddress.getLocalHost().toString().split("/")[1];
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter New Mid-Server port: ");
@@ -78,7 +78,9 @@ public class PatelP1MidServer extends CommonMidData {
         System.out.println("Port selected " + port);
         ServerSocket ss = new ServerSocket(port);
         System.out.println("Enter Mid-Server IP " + ms_ip + ":" + port);
-        Scanner authScan = new Scanner(new File("userList.txt")).useDelimiter("[\\r\\n\\|]+");
+        String currentPath = new java.io.File(".").getCanonicalPath();
+        System.out.println("Current dir:" + currentPath);
+        Scanner authScan = new Scanner(new File("./userList.txt")).useDelimiter("[\\r\\n\\|]+");
 
         // scan the authentication file to load all creds in a list
         while (authScan.hasNext()) {

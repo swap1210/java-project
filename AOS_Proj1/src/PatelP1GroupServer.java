@@ -82,7 +82,7 @@ class CommonGroupData {
 
 public class PatelP1GroupServer extends CommonGroupData {
 
-    public static void execute() throws IOException {
+    public static void main(String[] s) throws IOException {
         Socket ms_soc = null;
         DataInputStream ms_soc_dis = null;
         DataOutputStream ms_soc_dos = null;
