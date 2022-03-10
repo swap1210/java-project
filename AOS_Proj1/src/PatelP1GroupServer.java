@@ -92,15 +92,15 @@ public class PatelP1GroupServer extends CommonGroupData {
         String temp = "";
         while (!temp.contains(":")) {
             System.out.print("Enter Mid-Server IP: ");
-            temp = scn.nextLine();// "localhost:81";//
+            temp = scn.nextLine();
             if (!temp.contains(":")) {
                 System.out.println("Invalid Input");
                 continue;
             }
         }
 
-        String serverip = temp.split(":")[0]; // scn.nextLine();// "localhost";
-        String serverport = temp.split(":")[1]; // scn.nextLine();// "localhost";
+        String serverip = temp.split(":")[0]; 
+        String serverport = temp.split(":")[1]; 
         ms_soc = new Socket(serverip, Integer.parseInt(serverport));
         // obtaining input and out streams from Mid server
         ms_soc_dis = new DataInputStream(ms_soc.getInputStream());
@@ -134,7 +134,6 @@ public class PatelP1GroupServer extends CommonGroupData {
                 String menu = "";
                 menu += shopName[GroupTypeId] + ": Welcome to Group Server\n";
                 menu += printMenu();
-                // System.out.println("Sending " + menu);
                 dos.writeUTF(menu);
                 String clientInput = dis.readUTF();
                 System.out.println(clientInput);
@@ -150,7 +149,6 @@ public class PatelP1GroupServer extends CommonGroupData {
                     System.out.println("Weird Message" + e.getMessage());
                 }
             }
-
             ms_soc.close();
             ms_soc_dis.close();
             ms_soc_dos.close();

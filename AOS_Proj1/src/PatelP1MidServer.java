@@ -58,14 +58,8 @@ class AuthCred {
     // even with object reference you can't get the password but only match it
     // against this function
     public boolean matchPassword(String toMatch) {
-        // System.out.println("comparing " + toMatch + "-" + new String(this.password));
         return (toMatch.equals(new String(this.password)));
     }
-
-    public String getPass() {
-        return new String(password);
-    }
-
 }
 
 public class PatelP1MidServer extends CommonMidData {
@@ -74,23 +68,21 @@ public class PatelP1MidServer extends CommonMidData {
         String ms_ip = InetAddress.getLocalHost().toString().split("/")[1];
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter New Mid-Server port: ");
-        int port = Integer.parseInt(scan.nextLine());// 81;//
+        int port = Integer.parseInt(scan.nextLine());
         System.out.println("Port selected " + port);
         ServerSocket ss = new ServerSocket(port);
         System.out.println("Enter Mid-Server IP " + ms_ip + ":" + port);
-        String currentPath = new java.io.File(".").getCanonicalPath();
-        System.out.println("Current dir:" + currentPath);
         Scanner authScan = new Scanner(new File("./userList.txt")).useDelimiter("[\\r\\n\\|]+");
 
-        // scan the authentication file to load all creds in a list
+        // scan the authentication file to load all AuthCred object in a map
         while (authScan.hasNext()) {
             String user = authScan.next();
             char[] pass = authScan.next().toCharArray();
             String group = authScan.next();
             AUTH_LIST.put(user, new AuthCred(user, pass, group));
         }
-
         authScan.close();
+
         // keep on scanning for client
         while (true) {
             Socket s = null;

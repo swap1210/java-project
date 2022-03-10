@@ -23,14 +23,14 @@ public class PatelP1Sender {
             String temp = "";
             while (!temp.contains(":")) {
                 System.out.print("Enter Mid-Server IP: ");
-                temp = scn.nextLine();// "localhost:81";//
+                temp = scn.nextLine();
                 if (!temp.contains(":")) {
                     System.out.println("Invalid Input");
                     continue;
                 }
             }
-            String serverip = temp.split(":")[0]; // scn.nextLine();// "localhost";
-            String serverport = temp.split(":")[1]; // scn.nextLine();// "localhost";
+            String serverip = temp.split(":")[0]; 
+            String serverport = temp.split(":")[1]; 
             ms_soc = new Socket(serverip, Integer.parseInt(serverport));
             // obtaining input and out streams from Mid server
             ms_soc_dis = new DataInputStream(ms_soc.getInputStream());
@@ -50,10 +50,8 @@ public class PatelP1Sender {
                 // and then break from the while loop
                 if (tosend.trim().equalsIgnoreCase("CLOSE")) {
                     System.out.println("Closing this connection : " + ms_soc);
-                    // System.out.println("Connection closed");
                     break;
                 }
-
                 ms_soc_dos.writeUTF(tosend);
             }
 
