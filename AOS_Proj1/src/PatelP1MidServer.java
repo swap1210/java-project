@@ -78,7 +78,7 @@ public class PatelP1MidServer extends CommonMidData {
         System.out.println("Port selected " + port);
         ServerSocket ss = new ServerSocket(port);
         System.out.println("Enter Mid-Server IP " + ms_ip + ":" + port);
-        Scanner authScan = new Scanner(new File("../assets/userList.txt")).useDelimiter("[\\r\\n\\|]+");
+        Scanner authScan = new Scanner(new File("userList.txt")).useDelimiter("[\\r\\n\\|]+");
 
         // scan the authentication file to load all creds in a list
         while (authScan.hasNext()) {
