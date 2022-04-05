@@ -1,0 +1,8 @@
+{
+	"java.project.referencedLibraries": [
+		"lib/**/*.jar",
+		"/Users/swapn/Programming/Java/javafx-sdk-18/lib/**/*.jar",
+		"/Users/swapn/Programming/Java/external-lib/javafx-sdk-18 2/**/*.jar",
+		"/Users/swapn/Programming/Java/external-lib/javafx-sdk-18/lib/**/*.jar"
+	]
+}
