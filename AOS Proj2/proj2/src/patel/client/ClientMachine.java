@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import proj2.src.patel.registry.Client;
 import proj2.src.patel.registry.Coin;
-import proj2.src.patel.server.ServerRMIInterface;
+import proj2.src.patel.registry.ServerRMIInterface;
 
 public class ClientMachine {
     static Client CLIENT_OBJ;

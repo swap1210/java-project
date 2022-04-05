@@ -9,5 +9,4 @@ public interface MenuManager {
 
     void saveToFile();
 
-    
 }

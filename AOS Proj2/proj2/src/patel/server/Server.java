@@ -12,6 +12,7 @@ import proj2.src.patel.registry.Client;
 import proj2.src.patel.registry.ClientMenuManager;
 import proj2.src.patel.registry.Coin;
 import proj2.src.patel.registry.CoinMenuManager;
+import proj2.src.patel.registry.ServerRMIInterface;
 import proj2.src.patel.registry.Transaction;
 
 public class Server implements ServerRMIInterface {
@@ -21,13 +22,13 @@ public class Server implements ServerRMIInterface {
     Registry registry;
 
     public Server() {
-        System.out.println("In server constructor");
     }
 
     public void main_menu(Scanner server_scan) {
 
         // System.setProperty("java.rmi.server.hostname", "127.0.0.1");
         try {
+            System.out.print("Input server port no. ");
             int server_port = Integer.parseInt(server_scan.nextLine());
             registry = LocateRegistry.createRegistry(server_port);
             clientManager = new ClientMenuManager(registry, server_scan);
