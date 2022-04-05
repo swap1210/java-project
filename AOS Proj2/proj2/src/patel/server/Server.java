@@ -28,7 +28,8 @@ public class Server implements ServerRMIInterface {
 
         // System.setProperty("java.rmi.server.hostname", "127.0.0.1");
         try {
-            registry = LocateRegistry.createRegistry(9101);
+            int server_port = Integer.parseInt(server_scan.nextLine());
+            registry = LocateRegistry.createRegistry(server_port);
             clientManager = new ClientMenuManager(registry, server_scan);
             coinManager = new CoinMenuManager(registry, server_scan);
             // register for server operation

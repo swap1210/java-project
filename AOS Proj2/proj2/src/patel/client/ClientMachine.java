@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
 
-import javax.swing.text.html.parser.Entity;
-
 import proj2.src.patel.registry.Client;
 import proj2.src.patel.registry.Coin;
 import proj2.src.patel.server.ServerRMIInterface;
@@ -22,7 +20,8 @@ public class ClientMachine {
 
         // Locate Remote registry
         Scanner s = new Scanner(System.in);
-        String server_ip = "127.0.0.1:9101";// = s.nextLine();//
+        System.out.print("Input server ip:port ");
+        String server_ip = s.nextLine();// = "127.0.0.1:9101";//
         try {
             Registry registry = LocateRegistry.getRegistry(server_ip.split(":")[0],
                     Integer.parseInt(server_ip.split(":")[1]));
@@ -84,9 +83,18 @@ public class ClientMachine {
                             }
                         } else if (choice.trim().equalsIgnoreCase("3")) {
                             // [3] Buy Coin
-                            System.out.println(MAIN_SERVER.performPurchase("sp", true, "BTC", 10));
+                            System.out.print("Currency code to purchase ");
+                            String cc = s.nextLine();
+                            System.out.print("Enter amount in ($): ");
+                            double amt = Double.parseDouble(s.nextLine());
+                            System.out.println(MAIN_SERVER.performPurchase(client_id, true, cc, amt));
                         } else if (choice.trim().equalsIgnoreCase("4")) {
                             // [4] Sell Coin
+                            System.out.print("Currency code to sell ");
+                            String cc = s.nextLine();
+                            System.out.print("Enter quantity of count to be sold: ");
+                            double qty = Double.parseDouble(s.nextLine());
+                            System.out.println(MAIN_SERVER.performPurchase(client_id, false, cc, qty));
                         } else if (choice.trim().equalsIgnoreCase("5")) {
                             // [5] Log Out
                             break;
