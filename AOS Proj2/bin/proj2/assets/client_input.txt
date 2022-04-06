@@ -1,0 +1,17 @@
+2
+Swapnil
+sp
+pass
+200
+2
+Riddhi
+rp
+pass
+100
+2
+Ashwija
+ap
+pass
+150
+1
+7

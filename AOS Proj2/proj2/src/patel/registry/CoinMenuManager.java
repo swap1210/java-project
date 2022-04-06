@@ -1,5 +1,10 @@
 package proj2.src.patel.registry;
 
+//*********************************************************
+//**** Name: Swapnil Patel. Id: 1966690. Course: AOS
+//**** Project-2, Date: 04/06/2022
+//*********************************************************
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -30,6 +36,9 @@ public class CoinMenuManager implements MenuManager {
             ObjectInputStream ois = null;
             ois = new ObjectInputStream(new FileInputStream(new File("./proj2/assets/coins_data.obj")));
             coin_list = (Map<String, Coin>) ois.readObject();
+            for (Entry<String, Coin> coin : coin_list.entrySet()) {
+                this.registry.bind(coin.getKey(), coin.getValue());
+            }
             ois.close();
         } catch (Exception e) {
             System.err.println("Couldn't read coin file. " + e.getMessage());
@@ -92,23 +101,24 @@ public class CoinMenuManager implements MenuManager {
         }
     }
 
-    private void removeCoin() throws AccessException, RemoteException, NotBoundException {
+    private void removeCoin() throws Exception {
         System.out.print("Coin code to be deleted: ");
         String coin_code = s.nextLine();
-        System.out.print("Confirm deleting coin:[" + coin_code + "] (Y/N) : ");
-        String confirm = s.nextLine();
-        if (confirm.equalsIgnoreCase("Y")) {
-            coin_list.remove(coin_code);
-            System.out.println("Deleted client " + coin_code);
-            // if exist in coin list remove from list and registry
-            if (coin_list != null && coin_list.containsKey(coin_code)) {
+        // if exist in coin list remove from list and registry
+        if (this.coin_list != null && this.coin_list.containsKey(coin_code)) {
+            System.out.print("Confirm deleting coin:[" + coin_code + "] (Y/N) : ");
+            String confirm = s.nextLine();
+            if (confirm.equalsIgnoreCase("Y")) {
                 this.registry.unbind(coin_code);
-                coin_list.remove(coin_code);
+                this.coin_list.remove(coin_code);
+                System.out.println("Deleted client " + coin_code);
             }
+        } else {
+            throw new Exception("Invalid coin code");
         }
     }
 
-    void createCoin() throws RemoteException {
+    void createCoin() throws RemoteException, AlreadyBoundException {
         System.out.print("New Coin name: ");
         String name = s.nextLine();
         System.out.print("New Coin code: ");
@@ -119,8 +129,16 @@ public class CoinMenuManager implements MenuManager {
         String trading_volume = s.nextLine();
         System.out.print("New Coin opening price: ");
         String opening_price = s.nextLine();
-        this.coin_list.put(currency_code, new Coin(name, currency_code,
-                description, Double.parseDouble(trading_volume), Double.parseDouble(opening_price)));
+        Coin temp_coin = new Coin(name, currency_code,
+                description, Double.parseDouble(trading_volume), Double.parseDouble(opening_price));
+
+        // if exist in coin list remove from list and registry
+        if (this.coin_list != null) {
+            this.registry.bind(currency_code, temp_coin);
+            this.coin_list.put(currency_code, temp_coin);
+        } else {
+            System.out.println("Coin list not initialized");
+        }
     }
 
     private void editCoin() throws Exception {
@@ -129,20 +147,33 @@ public class CoinMenuManager implements MenuManager {
         String currency_code = s.nextLine();
         System.out.println("If you don't want to change just press Enter");
         Coin edited_coin = coin_list.get(currency_code);
+        if (edited_coin == null) {
+            throw new Exception("No such coin found");
+        }
         System.out.print("Change coin name (" + edited_coin.name + ") :");
         String c_name = s.nextLine();
         if (c_name.isBlank())
             c_name = edited_coin.name;
-        System.out.print("Change coin description (" + edited_coin.name + ") :");
+        System.out.print("Change coin description (" + edited_coin.description + ") :");
         String c_desc = s.nextLine();
         if (c_desc.isBlank())
-            c_desc = edited_coin.getDescription();
-        System.out.print("Change coin price: ");
-        double c_price = Double.parseDouble(s.nextLine());
-        System.out.print("Change coin volume: ");
-        double c_volume = Double.parseDouble(s.nextLine());
-
+            c_desc = edited_coin.description;
+        System.out.print("Change coin price(" + edited_coin.opening_price + "): ");
+        String temp = s.nextLine();
+        if (temp.isBlank())
+            temp = "0";
+        double c_price = Double.parseDouble(temp);
+        if (c_price == 0)
+            c_price = edited_coin.opening_price;
+        System.out.print("Change coin volume(" + edited_coin.trading_volume + "): ");
+        temp = s.nextLine();
+        if (temp.isBlank())
+            temp = "0";
+        double c_volume = Double.parseDouble(temp);
+        if (c_volume == 0)
+            c_volume = edited_coin.trading_volume;
         edited_coin.editCoin(c_name, c_desc, c_volume, c_price);
+        this.registry.rebind(currency_code, edited_coin);
     }
 
     void listCoins() {
@@ -165,7 +196,7 @@ public class CoinMenuManager implements MenuManager {
             oos.writeObject(coin_list);
             // oos.flush();
             oos.close();
-            System.out.println("Saved to file");
+            // System.out.println("Saved to file");
         } catch (Exception e) {
             System.err.println(e);
         }

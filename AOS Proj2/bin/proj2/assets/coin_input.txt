@@ -3,11 +3,13 @@ Bitcoin
 BTC
 (₿) is digital currency without a central bank.
 899.707
+35907049332.0
 47149.81
 2
 Ethereum
 ETH
 (Ξ) is open-source blockchain with smart contract functionality.
+405753171215.0
 20227902785.0
 120153233.0
 7

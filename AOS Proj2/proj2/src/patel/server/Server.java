@@ -6,7 +6,11 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
+
+//*********************************************************
+//**** Name: Swapnil Patel. Id: 1966690. Course: AOS
+//**** Project-2, Date: 04/06/2022
+//*********************************************************
 
 import proj2.src.patel.registry.Client;
 import proj2.src.patel.registry.ClientMenuManager;
@@ -74,12 +78,12 @@ public class Server implements ServerRMIInterface {
             return "Invalid coin code!";
         }
         // if buying
-        double calc_buying_qty = buying ? amt_or_qty / coin.getOpening_price() : 0;
+        double calc_buying_qty = buying ? amt_or_qty / coin.opening_price : 0;
         // if selling fix the selling price
-        double calc_selling_amt = !buying ? (amt_or_qty * coin.getOpening_price()) : 0;
+        double calc_selling_amt = !buying ? (amt_or_qty * coin.opening_price) : 0;
 
         // check volume avaiable if buying
-        if (buying && calc_buying_qty > coin.getTrading_volume()) {
+        if (buying && calc_buying_qty > coin.trading_volume) {
             return "Requested Coin Volume unavailable in the sever!";
         }
 
@@ -118,14 +122,14 @@ public class Server implements ServerRMIInterface {
         // public Transaction(String currency_code, double price, double qty, String
         // transactionType)
         // update transaction list
-        client.wallet.transactions.add(new Transaction(currency_code, coin.getOpening_price(),
+        client.wallet.transactions.addFirst(new Transaction(currency_code, coin.opening_price,
                 (buying ? calc_buying_qty : amt_or_qty), (buying ? "Bought" : "Sold")));
 
         // update coin volume
         if (buying) {
-            coin.setTrading_volume(coin.getTrading_volume() + calc_buying_qty);
+            coin.trading_volume = (coin.trading_volume - calc_buying_qty);
         } else {
-            coin.setTrading_volume(coin.getTrading_volume() + amt_or_qty);
+            coin.trading_volume = (coin.trading_volume + amt_or_qty);
         }
 
         // save coin state
@@ -138,12 +142,14 @@ public class Server implements ServerRMIInterface {
 
     // RMI to get client list
     @Override
-    public Map<String, Client> getClientList() throws RemoteException {
-        return this.clientManager.clients;
+    public Client getClient(String client_id, String client_pass) throws RemoteException {
+        Client CLIENT_OBJ = this.clientManager.clients.get(client_id);
+        // look for your user id and pass make returning object null if invalid login
+        if (!CLIENT_OBJ.checkLogin(client_id, client_pass)) {
+            CLIENT_OBJ = null;
+        }
+
+        return CLIENT_OBJ;
     }
 
-    @Override
-    public Map<String, Coin> getCoinList() throws RemoteException {
-        return this.coinManager.coin_list;
-    }
 }
