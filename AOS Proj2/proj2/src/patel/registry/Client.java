@@ -8,7 +8,7 @@ package proj2.src.patel.registry;
 import java.io.Serializable;
 
 public class Client implements Serializable {
-    String name;
+    public String name;
     final String id;
     private char[] pass; // to make this variable more secure than others
     public Wallet wallet;

@@ -70,7 +70,6 @@ public class Server implements ServerRMIInterface {
             throws RemoteException {
         // amt_or_qty is amt in dollar when buying coin and qty of coin while selling
         // coin
-        String temp = "";
 
         // check coin code
         Coin coin = coinManager.coin_list.get(currency_code);
@@ -137,7 +136,8 @@ public class Server implements ServerRMIInterface {
 
         // save client state
         clientManager.saveToFile();
-        return temp;
+        System.out.println("here");
+        return "TRANSACTION SUCCESS\nUser: " + client.name + "\n" + client.wallet.transactions.getFirst().toString();
     }
 
     // RMI to get client list
