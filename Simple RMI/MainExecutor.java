@@ -13,12 +13,12 @@ public class MainExecutor {
         String choice = s.nextLine();
         if (choice.equalsIgnoreCase("S")) {
             System.out.println("Server");
-            ServerMachine ss = new ServerMachine();
+            ServerMachine ss = new ServerMachine(s);
             System.out.print("Enter to exit server");
             s.nextLine();
         } else {
             System.out.println("Client");
-            ClientMachine cc = new ClientMachine();
+            ClientMachine cc = new ClientMachine(s);
         }
         s.close();
     }
