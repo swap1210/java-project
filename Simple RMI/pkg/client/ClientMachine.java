@@ -17,9 +17,9 @@ public class ClientMachine {
 
         // keep on asking for asking username password
         while (true) {
-            System.out.println("Username: ");
+            System.out.print("Username: ");
             String input_username = s.nextLine();
-            System.out.println("Password: ");
+            System.out.print("Password: ");
             String input_password = s.nextLine();
             if (remote_client_stub.checkCredentials(input_username, input_password)) {
                 System.out.println("Valid credentials");
