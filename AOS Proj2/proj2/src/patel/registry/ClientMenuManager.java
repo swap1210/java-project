@@ -7,7 +7,6 @@ package proj2.src.patel.registry;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -42,17 +41,6 @@ public class ClientMenuManager implements MenuManager {
     }
 
     public void menu() {
-
-        // if load from file modify scanner
-        if (DEBUG_FLAG) {
-            try {
-                System.out.println(System.getProperty("user.dir"));
-                s = new Scanner(new File("./proj2/assets/client_input.txt"));
-            } catch (FileNotFoundException e) {
-                System.err.println("File Not Found");
-            }
-        }
-
         String choice;
         while (true) {
             System.out.print(

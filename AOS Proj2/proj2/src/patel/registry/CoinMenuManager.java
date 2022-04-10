@@ -7,13 +7,10 @@ package proj2.src.patel.registry;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
@@ -51,14 +48,6 @@ public class CoinMenuManager implements MenuManager {
 
     public void menu() {
 
-        // if load from file modify scanner
-        if (DEBUG_FLAG) {
-            try {
-                s = new Scanner(new File("./proj2/assets/coin_input.txt"));
-            } catch (FileNotFoundException e) {
-                System.err.println("Error " + e.getMessage());
-            }
-        }
         String choice;
         while (true) {
 

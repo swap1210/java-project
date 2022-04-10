@@ -6,7 +6,7 @@ import java.util.Scanner;
 import pkg.client.ClientMachine;
 import pkg.server.ServerMachine;
 
-public class MainExecutor {
+public class MainExecutor {  
     public static void main(String[] args) throws RemoteException, AlreadyBoundException, NotBoundException {
         Scanner s = new Scanner(System.in);
         System.out.print("S/C for Server or client ");
