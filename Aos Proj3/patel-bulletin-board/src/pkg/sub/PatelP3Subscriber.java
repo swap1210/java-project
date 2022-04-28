@@ -68,7 +68,8 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
 
             try {
                 boolean break_loop = false;
-                System.out.print(" [1]Subscribe to Topic\n [2]Unsubscribe to Topic\n [3]Exit\n choice: ");
+                System.out.print(
+                        " [1]-Subscribe to Topic\n [2]-Unsubscribe to Topic\n [3]-Subscription list\n [4]-Back\n choice: ");
                 int choice = Integer.parseInt(this.scan.nextLine());
 
                 switch (choice) {
@@ -79,6 +80,10 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
                         unsubscribeAction();
                         break;
                     case 3:
+                        System.out.println("  Subscribed to:");
+                        subscription_list.forEach((t) -> System.out.println("   " + t));
+                        break;
+                    case 4:
                         break_loop = true;
                         break;
                     default:
@@ -115,6 +120,7 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
         }
         try {
             this.service_stub.subscribe(temp_topic1, this.myip);
+            this.subscription_list.add(temp_topic1);
         } catch (RemoteException e) {
             System.err.println("Error while subscribing to " + temp_topic1);
         }
@@ -141,6 +147,7 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
         }
         try {
             this.service_stub.unSubscribe(temp_topic1, this.myip);
+            this.subscription_list.remove(temp_topic1);
         } catch (RemoteException e) {
             System.err.println("Error while subscribing to " + temp_topic1);
         }
@@ -148,7 +155,7 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
 
     @Override
     public void onPublish(Message message) throws RemoteException {
-        System.out.println(message);
+        System.out.println("\n" + message);
     }
 
 }

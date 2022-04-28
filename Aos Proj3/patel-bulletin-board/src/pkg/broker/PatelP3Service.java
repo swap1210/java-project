@@ -47,7 +47,7 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
         System.out.println(" Welcome to " + Basic.TITLE + "s: ");
         String choice;
         while (true) {
-            System.out.print(" [1]List Publishers\n [2]List Subscribers\n [3]Back\nChoice: ");
+            System.out.print(" [1]-List Publishers\n [2]-List Subscribers\n [3]-Back\nChoice: ");
             choice = this.scan.nextLine();
             boolean exit_flag = false;
             switch (choice.charAt(0)) {
@@ -56,15 +56,15 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
                     publication_map.forEach((t, p) -> System.out.println(p));
                     break;
                 case '2':
-                    System.out.println("Subscribers: ");
+                    System.out.println(" Subscribers: ");
                     for (Topic topic_key : this.sub_map.keySet()) {
-                        System.out.println(topic_key + ":");
+                        System.out.println("  " + topic_key + ":");
                         Map<String, SubRMIInterface> temp_sub_map = this.sub_map.get(topic_key);
                         if (temp_sub_map != null) {
-
                             for (String sub_key : this.sub_map.get(topic_key).keySet()) {
-                                System.out.println("sub_key " + sub_key);
+                                System.out.println("   " + sub_key);
                             }
+                            System.out.println();
                         }
                     }
                     break;
@@ -100,17 +100,23 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
     @Override
     public void publish(Message message) throws RemoteException {
 
+        Topic topic_key = message.getTopic();
         // check if topic exists
-        if (publication_map.containsKey(message.getTopic())) {
-            LinkedList<Message> currentPublicationList = (LinkedList<Message>) publication_map.get(message.getTopic());
+        if (publication_map.containsKey(topic_key)) {
+            LinkedList<Message> currentPublicationList = (LinkedList<Message>) publication_map.get(topic_key);
             currentPublicationList.addFirst(message);
         } else {
             List<Message> currentPublicationList = new LinkedList<Message>();
             currentPublicationList.add(message);
-            publication_map.put(message.getTopic(), currentPublicationList);
+            publication_map.put(topic_key, currentPublicationList);
         }
 
-        // TODO loop through all the subscribers in the Topic map
+        Map<String, SubRMIInterface> temp_sub_map = this.sub_map.get(topic_key);
+        if (temp_sub_map != null) {
+            for (String sub_key : this.sub_map.get(topic_key).keySet()) {
+                this.sub_map.get(topic_key).get(sub_key).onPublish(message);
+            }
+        }
     }
 
     @Override
@@ -119,7 +125,6 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
         try {
             Registry registry = LocateRegistry.getRegistry(client_ip.split(":")[0],
                     Integer.parseInt(client_ip.split(":")[1]));
-            // System.out.println("Connected to [" + client_ip + "]");
 
             // get client manager instance
             temp_sub_stub = (SubRMIInterface) registry.lookup("SUBSCRIBER");
@@ -137,6 +142,11 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
 
     @Override
     public void unSubscribe(Topic topic, String subscriber_addr) throws RemoteException {
-        // TODO remove from the
+        try {
+            this.sub_map.get(topic).remove(subscriber_addr);
+        } catch (Exception e) {
+            System.err.println("unable to unsubscribe " + subscriber_addr + " from " + topic + " because");
+            e.printStackTrace();
+        }
     }
 }

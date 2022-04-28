@@ -21,7 +21,7 @@ public class PatelP3Publisher extends MenuClass {
             try {
                 int i = 0;
                 for (Topic temp_topic : Topic.values()) {
-                    System.out.println("[" + (i++) + "] " + temp_topic);
+                    System.out.println("[" + (i++) + "]-" + temp_topic);
                 }
                 System.out.print("Topic of publication: ");
                 int topic_selected = Integer.parseInt(this.scan.nextLine());
@@ -62,12 +62,12 @@ public class PatelP3Publisher extends MenuClass {
         while (true) {
             try {
                 boolean break_loop = false;
-                System.out.print(" [1]Publish\n [2]Exit\n choice: ");
+                System.out.print(" [1]-Publish\n [2]-Back\n choice: ");
                 int choice = Integer.parseInt(this.scan.nextLine());
 
                 switch (choice) {
                     case 1:
-                        System.out.print("Message to publish: ");
+                        System.out.print(" Publish: ");
                         String msg = this.scan.nextLine();
                         this.service_stub.publish(new Message(this.topic, this.name, msg));
                         break;
