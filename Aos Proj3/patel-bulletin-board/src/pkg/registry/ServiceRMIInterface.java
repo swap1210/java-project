@@ -14,5 +14,7 @@ import pkg.comm.Basic.Topic;
 public interface ServiceRMIInterface extends Remote {
     void publish(Message message) throws RemoteException;
 
-    void subscribe(Topic topic) throws RemoteException;
+    void subscribe(Topic topic, String subscriber_addr) throws RemoteException;
+
+    void unSubscribe(Topic topic, String subscriber_addr) throws RemoteException;
 }

@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
+import pkg.comm.Basic;
 import pkg.comm.MenuClass;
 import pkg.comm.Message;
 import pkg.comm.Basic.Topic;
@@ -23,9 +24,7 @@ public class PatelP3Publisher extends MenuClass {
                     System.out.println("[" + (i++) + "] " + temp_topic);
                 }
                 System.out.print("Topic of publication: ");
-                int topic_selected = s.nextInt();
-                // flush new line
-                s.nextLine();
+                int topic_selected = Integer.parseInt(this.scan.nextLine());
                 this.topic = Topic.values()[topic_selected];
                 // System.out.println("topic selected " + this.topic);
             } catch (Exception e) {
@@ -35,16 +34,16 @@ public class PatelP3Publisher extends MenuClass {
             // connect with service
             while (this.service_stub == null) {
                 try {
-                    System.out.print("Input Bulletin board Service ip:port ");
-                    String server_ip = "127.0.0.1:911";// = s.nextLine();//
+                    System.out.print("Input " + Basic.TITLE + " ip:port ");
+                    String server_ip = s.nextLine();// = "127.0.0.1:911";//
                     Registry registry = LocateRegistry.getRegistry(server_ip.split(":")[0],
                             Integer.parseInt(server_ip.split(":")[1]));
-                    System.out.println("Connected to Bulletin board Service");
+                    System.out.println("Connected to " + Basic.TITLE);
 
                     // get client manager instance
                     this.service_stub = (ServiceRMIInterface) registry.lookup("BULLETIN_BOARD_SERVICE");
                 } catch (Exception e) {
-                    System.err.println("Invalid Bulletin board Service details! try again. " + e.toString());
+                    System.err.println("Invalid " + Basic.TITLE + " details! try again. " + e.toString());
                 }
             }
         }
@@ -63,9 +62,8 @@ public class PatelP3Publisher extends MenuClass {
         while (true) {
             try {
                 boolean break_loop = false;
-                System.out.print(" [1] Publish\n [2] Exit\n choice: ");
-                int choice = this.scan.nextInt();
-                this.scan.nextLine();
+                System.out.print(" [1]Publish\n [2]Exit\n choice: ");
+                int choice = Integer.parseInt(this.scan.nextLine());
 
                 switch (choice) {
                     case 1:

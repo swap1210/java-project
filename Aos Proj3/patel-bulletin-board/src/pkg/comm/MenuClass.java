@@ -1,5 +1,6 @@
 package pkg.comm;
 
+import java.net.SocketException;
 import java.util.Scanner;
 
 public abstract class MenuClass {
@@ -11,5 +12,5 @@ public abstract class MenuClass {
         this.name = name;
     }
 
-    public abstract void menu();
+    public abstract void menu() throws SocketException;
 }
