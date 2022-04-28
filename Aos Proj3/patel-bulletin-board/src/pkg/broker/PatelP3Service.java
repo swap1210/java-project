@@ -1,7 +1,5 @@
 package pkg.broker;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,7 +20,6 @@ import pkg.registry.SubRMIInterface;
 
 public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
 
-    private Map<String, AuthCred> AUTH_MAP = new HashMap<String, AuthCred>();
     private Map<Basic.Topic, List<Message>> publication_map;
     // Map of all the topics and each subscribers in the map are mapped to their
     // respective ip addresses so it's convinent to remove them
@@ -40,7 +37,6 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
         serviceRegistry.rebind("BULLETIN_BOARD_SERVICE", sri);
         publication_map = new HashMap<Basic.Topic, List<Message>>();
         sub_map = new HashMap<Basic.Topic, Map<String, SubRMIInterface>>();
-        loadAuthList();
     }
 
     public void menu() {
@@ -77,23 +73,6 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
             if (exit_flag) {
                 break;
             }
-        }
-    }
-
-    void loadAuthList() {
-        // System.out.println(System.getProperty("user.dir"));
-        try (Scanner authScan = new Scanner(new File("./patel-bulletin-board/res/userList.txt"))
-                .useDelimiter("[\\r\\n\\|]+")) {
-            // scan the authentication file to load all AuthCred object in a map
-            while (authScan.hasNext()) {
-                String nodeType = authScan.next();
-                String user = authScan.next();
-                char[] pass = authScan.next().toCharArray();
-                AUTH_MAP.put(user, new AuthCred(nodeType, user, pass));
-            }
-            authScan.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
@@ -148,5 +127,10 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
             System.err.println("unable to unsubscribe " + subscriber_addr + " from " + topic + " because");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<Message> getAllPublications(Topic topic) throws RemoteException {
+        return this.publication_map.get(topic);
     }
 }

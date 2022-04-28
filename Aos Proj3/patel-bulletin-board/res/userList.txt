@@ -1,4 +1,0 @@
-pub|sp|p
-sub|ss|p
-sub|dd|p
-pub|kk|p

@@ -21,9 +21,9 @@ public class PatelP3Publisher extends MenuClass {
             try {
                 int i = 0;
                 for (Topic temp_topic : Topic.values()) {
-                    System.out.println("[" + (i++) + "]-" + temp_topic);
+                    System.out.println(" [" + (i++) + "]-" + temp_topic);
                 }
-                System.out.print("Topic of publication: ");
+                System.out.print(" Topic of publication: ");
                 int topic_selected = Integer.parseInt(this.scan.nextLine());
                 this.topic = Topic.values()[topic_selected];
                 // System.out.println("topic selected " + this.topic);
@@ -34,16 +34,16 @@ public class PatelP3Publisher extends MenuClass {
             // connect with service
             while (this.service_stub == null) {
                 try {
-                    System.out.print("Input " + Basic.TITLE + " ip:port ");
+                    System.out.print(" Input " + Basic.TITLE + " ip:port ");
                     String server_ip = s.nextLine();// = "127.0.0.1:911";//
                     Registry registry = LocateRegistry.getRegistry(server_ip.split(":")[0],
                             Integer.parseInt(server_ip.split(":")[1]));
-                    System.out.println("Connected to " + Basic.TITLE);
+                    System.out.println(" Connected to " + Basic.TITLE);
 
                     // get client manager instance
                     this.service_stub = (ServiceRMIInterface) registry.lookup("BULLETIN_BOARD_SERVICE");
                 } catch (Exception e) {
-                    System.err.println("Invalid " + Basic.TITLE + " details! try again. " + e.toString());
+                    System.err.println(" Invalid " + Basic.TITLE + " details! try again. " + e.toString());
                 }
             }
         }
@@ -76,7 +76,7 @@ public class PatelP3Publisher extends MenuClass {
                         break_loop = true;
                         break;
                     default:
-                        throw new Exception("Invalid Publisher input");
+                        throw new Exception(" Invalid Publisher input");
                 }
 
                 if (break_loop)

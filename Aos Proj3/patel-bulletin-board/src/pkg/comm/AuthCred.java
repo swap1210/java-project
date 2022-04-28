@@ -1,12 +1,18 @@
-package pkg.broker;
+package pkg.comm;
 
 // class to store authentication details securely
-class AuthCred {
-    private String nodeType;
+public class AuthCred {
+    public enum NodeType {
+        BBS,
+        PUB,
+        SUB
+    }
+
+    private NodeType nodeType;
     private String username;
     private char[] password;
 
-    public AuthCred(String nodeType, String username, char[] password) {
+    public AuthCred(NodeType nodeType, String username, char[] password) {
         this.username = username;
         this.password = password;
         this.nodeType = nodeType;
@@ -16,7 +22,7 @@ class AuthCred {
         return username;
     }
 
-    public String getnodeType() {
+    public NodeType getNodeType() {
         return nodeType;
     }
 

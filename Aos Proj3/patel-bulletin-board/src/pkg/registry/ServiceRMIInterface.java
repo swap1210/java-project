@@ -7,6 +7,7 @@ package pkg.registry;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import pkg.comm.Message;
 import pkg.comm.Basic.Topic;
@@ -17,4 +18,6 @@ public interface ServiceRMIInterface extends Remote {
     void subscribe(Topic topic, String subscriber_addr) throws RemoteException;
 
     void unSubscribe(Topic topic, String subscriber_addr) throws RemoteException;
+
+    List<Message> getAllPublications(Topic topic) throws RemoteException;
 }
