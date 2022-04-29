@@ -126,7 +126,8 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
         }
         try {
             List<Message> pub_list = this.service_stub.getAllPublications(temp_topic1);
-            pub_list.forEach((m) -> System.out.print("\n" + m));
+            if (pub_list != null)
+                pub_list.forEach((m) -> System.out.print("\n" + m));
         } catch (RemoteException e) {
             System.err.println("Error while fetching publication queue for" + temp_topic1);
             e.printStackTrace();
@@ -166,7 +167,7 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
         while (temp_topic1 == null) {
             try {
                 System.out.print(" List of topics: ");
-                int i = -1;
+                int i = 0;
                 for (Topic temp_topic : this.subscription_list) {
                     System.out.println(" [" + (i++) + "]-" + temp_topic);
                 }

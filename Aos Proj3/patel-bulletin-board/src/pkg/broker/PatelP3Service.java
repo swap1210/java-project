@@ -59,17 +59,6 @@ public class PatelP3Service extends MenuClass implements ServiceRMIInterface {
                     break;
                 case '2':
                     System.out.println(" Subscribers:");
-                    // for (Topic topic_key : this.sub_map.keySet()) {
-                    // System.out.println(" " + topic_key + ":");
-                    // Map<String, SubRMIInterface> temp_sub_map = this.sub_map.get(topic_key);
-                    // if (temp_sub_map != null) {
-                    // for (String sub_key : this.sub_map.get(topic_key).keySet()) {
-                    // System.out.println(" " + sub_key);
-                    // }
-                    // System.out.println();
-                    // }
-                    // }
-
                     for (Topic topics : this.sub_ip_list_map.keySet()) {
                         System.out.println("  [" + topics + "]:");
                         this.sub_ip_list_map.get(topics).forEach((stub_ip) -> System.out.println("   " + stub_ip));
