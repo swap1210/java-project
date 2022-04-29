@@ -188,7 +188,6 @@ public class PatelP3Subscriber extends MenuClass implements SubRMIInterface {
     @Override
     public void onPublish(Message message) throws RemoteException {
         System.out.print("\n" + message);
-        this.scan.nextLine();
     }
 
 }
