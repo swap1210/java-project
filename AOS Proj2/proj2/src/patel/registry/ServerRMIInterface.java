@@ -12,5 +12,4 @@ public interface ServerRMIInterface extends Remote {
     String performPurchase(String user_id, boolean buying, String currency_code, double amt) throws RemoteException;
 
     public Client getClient(String client_id, String client_pass) throws RemoteException;
-
 }
